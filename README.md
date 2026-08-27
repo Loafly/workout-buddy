@@ -1,6 +1,6 @@
 # 운동 비서 (workout-buddy)
 
-`docs/plan.md` 의 운동·식단 계획서를 그대로 앱으로 옮긴 개인용 PWA.
+개인 운동·식단 계획서를 그대로 옮긴 개인용 PWA.
 데이터는 **기기 로컬(IndexedDB)** 에만 저장되며 서버로 나가지 않습니다.
 
 ## 화면
@@ -47,7 +47,6 @@ src/
   lib/        date.ts · stats.ts(볼륨·주평균 체중·감량속도)
   pages/      Today · Diet · History · Guide · Settings
   components/ TabBar · ExerciseCard · EyeRuleBanner · ui.tsx
-docs/plan.md  원본 계획서
 ```
 
 ## 주의
@@ -55,3 +54,10 @@ docs/plan.md  원본 계획서
 
 이 앱의 내용은 일반적인 운동·영양 정보이며 의학적 조언이 아닙니다.
 망막 관련 운동 허용 범위는 주치의 확인이 필요합니다.
+
+## 라이선스
+
+[PolyForm Noncommercial License 1.0.0](LICENSE.md) — 소스는 공개되어 있고 개인적·비영리 목적으로는
+열람·수정·재배포할 수 있지만, **상업적 이용은 허용되지 않습니다.**
+
+Required Notice: Copyright 2026 Namseok Kim (https://github.com/Loafly)
