@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 
 export function Card({
   children,
@@ -79,6 +79,19 @@ export function Button({
   )
 }
 
+/**
+ * 입력값을 로컬 state로 들고 있다가 커밋합니다.
+ * 저장이 IndexedDB를 왕복하는 동안 재렌더가 입력 중인 글자를 덮어쓰는 것을 막습니다.
+ */
+function useDraft(value: string) {
+  const [text, setText] = useState(value)
+  const [focused, setFocused] = useState(false)
+  useEffect(() => {
+    if (!focused) setText(value)
+  }, [value, focused])
+  return { text, setText, onFocus: () => setFocused(true), onBlur: () => setFocused(false) }
+}
+
 export function NumberField({
   value,
   onChange,
@@ -94,15 +107,24 @@ export function NumberField({
   step?: number
   className?: string
 }) {
+  const draft = useDraft(value == null ? '' : String(value))
+
   return (
     <label className={`relative flex items-center ${className}`}>
       <input
         type="number"
         inputMode="decimal"
         step={step}
-        value={value ?? ''}
+        value={draft.text}
         placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
+        onFocus={draft.onFocus}
+        onBlur={draft.onBlur}
+        onChange={(e) => {
+          const t = e.target.value
+          draft.setText(t)
+          if (t === '') onChange(null)
+          else if (!Number.isNaN(Number(t))) onChange(Number(t))
+        }}
         className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pr-7 pl-2.5 text-sm tabular-nums text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
       />
       {suffix && (
@@ -111,6 +133,63 @@ export function NumberField({
         </span>
       )}
     </label>
+  )
+}
+
+export function DraftInput({
+  value,
+  onChange,
+  placeholder,
+  className = '',
+}: {
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+  className?: string
+}) {
+  const draft = useDraft(value)
+  return (
+    <input
+      value={draft.text}
+      placeholder={placeholder}
+      onFocus={draft.onFocus}
+      onBlur={draft.onBlur}
+      onChange={(e) => {
+        draft.setText(e.target.value)
+        onChange(e.target.value)
+      }}
+      className={`rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none ${className}`}
+    />
+  )
+}
+
+export function DraftTextArea({
+  value,
+  onChange,
+  placeholder,
+  rows = 3,
+  className = '',
+}: {
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+  rows?: number
+  className?: string
+}) {
+  const draft = useDraft(value)
+  return (
+    <textarea
+      value={draft.text}
+      placeholder={placeholder}
+      rows={rows}
+      onFocus={draft.onFocus}
+      onBlur={draft.onBlur}
+      onChange={(e) => {
+        draft.setText(e.target.value)
+        onChange(e.target.value)
+      }}
+      className={`w-full rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none ${className}`}
+    />
   )
 }
 

@@ -4,6 +4,8 @@ import PageHeader from '../components/PageHeader'
 import { Button, Card, Empty, NumberField, Pill, SectionTitle } from '../components/ui'
 import { db, getSetting, setSetting, type BodyRecord, type WorkoutSession } from '../db'
 import { PHASES, PROGRESS_NOTES, VOLUME_RANGE } from '../data/guide'
+import { phaseWeight } from '../data/profile'
+import { useProfile } from '../hooks/useProfile'
 import { findExercise } from '../data/program'
 import { formatKo, formatShort, toDateKey, weekIndex, weekStart } from '../lib/date'
 import { sessionTonnage, weeklyLossRate, weeklyVolume, weeklyWeightAverages } from '../lib/stats'
@@ -13,6 +15,7 @@ export default function History() {
   const [w, setW] = useState<number | null>(null)
   const [waist, setWaist] = useState<number | null>(null)
 
+  const { profile } = useProfile()
   const sessions = useLiveQuery(() => db.sessions.toArray(), [], [] as WorkoutSession[])
   const body = useLiveQuery(() => db.body.toArray(), [], [] as BodyRecord[])
   const startDate = useLiveQuery(() => getSetting<string | null>('programStart', null), [], null)
@@ -54,7 +57,9 @@ export default function History() {
         <Card>
           <div className="flex items-center gap-2">
             <Pill tone="sky">{phase.weeks}</Pill>
-            {phase.weight && <span className="text-xs text-slate-500">목표 {phase.weight}</span>}
+            {phaseWeight(profile, phase.endWeek) != null && (
+              <span className="text-xs text-slate-500">목표 {phaseWeight(profile, phase.endWeek)}kg 전후</span>
+            )}
           </div>
           <p className="mt-2 text-sm text-slate-200">{phase.goal}</p>
         </Card>

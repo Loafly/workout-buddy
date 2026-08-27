@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import PageHeader from '../components/PageHeader'
 import { Button, Card, Empty, NumberField, Pill, SectionTitle } from '../components/ui'
-import { MEAL_PRESETS, NUTRITION_RULES, PROTEIN_REFERENCE, TARGETS } from '../data/nutrition'
+import { MEAL_PRESETS, NUTRITION_RULES, PROTEIN_REFERENCE } from '../data/nutrition'
+import { fatFloor, isConfigured, macrosFor } from '../data/profile'
+import { useProfile } from '../hooks/useProfile'
 import { db, type Meal, type WorkoutSession } from '../db'
 import { formatKo, toDateKey } from '../lib/date'
 
@@ -53,12 +56,13 @@ export default function Diet() {
   }>(blank)
   const [adding, setAdding] = useState(false)
 
+  const { profile } = useProfile()
   const meals = useLiveQuery(() => db.meals.where('date').equals(today).toArray(), [today], [] as Meal[])
   const sessions = useLiveQuery(() => db.sessions.toArray(), [], [] as WorkoutSession[])
   const daily = useLiveQuery(() => db.daily.get(today), [today])
 
   const isTrainingDay = sessions.some((s) => s.date === today)
-  const target = isTrainingDay ? TARGETS.training : TARGETS.rest
+  const target = macrosFor(profile, isTrainingDay)
 
   const sum = meals.reduce(
     (a, m) => ({
@@ -100,6 +104,15 @@ export default function Diet() {
         right={<Pill tone={isTrainingDay ? 'sky' : 'slate'}>{isTrainingDay ? '운동일' : '휴식일'}</Pill>}
       />
 
+      {!isConfigured(profile) && (
+        <Link
+          to="/settings"
+          className="mb-3 block rounded-2xl border border-dashed border-amber-900/60 bg-amber-950/20 p-4 text-sm text-amber-200"
+        >
+          체중을 입력해야 목표 칼로리와 매크로가 계산됩니다 — 설정에서 프로필 채우기 →
+        </Link>
+      )}
+
       <Card>
         <div className="mb-3 flex items-baseline justify-between">
           <span className="text-3xl font-bold tabular-nums text-slate-100">
@@ -114,9 +127,14 @@ export default function Diet() {
           <MacroBar label="탄수화물" value={sum.carbs} target={target.carbs} unit="g" tone="bg-emerald-500" />
           <MacroBar label="지방" value={sum.fat} target={target.fat} unit="g" tone="bg-amber-500" />
         </div>
-        {sum.protein < target.protein && (
+        {sum.protein < target.protein && target.protein > 0 && (
           <p className="mt-3 text-xs text-slate-500">
             단백질 {Math.round(target.protein - sum.protein)}g 남음 — 끼니당 35~40g 기준
+          </p>
+        )}
+        {target.fat > 0 && target.fat < fatFloor(profile) && (
+          <p className="mt-2 text-xs text-amber-400/80">
+            지방 목표가 하한(0.7g/kg = {fatFloor(profile)}g) 아래입니다. 호르몬에 영향이 갑니다.
           </p>
         )}
       </Card>

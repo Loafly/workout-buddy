@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import PageHeader from '../components/PageHeader'
-import EyeRuleBanner from '../components/EyeRuleBanner'
+import SafetyBanner from '../components/SafetyBanner'
 import ExerciseCard from '../components/ExerciseCard'
-import { Button, Card, Pill, SectionTitle, NumberField } from '../components/ui'
+import { Button, Card, DraftTextArea, NumberField, Pill, SectionTitle } from '../components/ui'
 import { SESSIONS, setsForMode, type SessionType } from '../data/program'
 import { CARDIO } from '../data/guide'
+import { useProfile } from '../hooks/useProfile'
 import { db, type ExerciseLog, type SetLog, type WorkoutSession } from '../db'
 import { formatKo, toDateKey, weekStart } from '../lib/date'
 import { lastPerformance } from '../lib/stats'
@@ -31,6 +32,7 @@ export default function Today() {
   const [short, setShort] = useState(false)
   const [pickedType, setPickedType] = useState<SessionType | null>(null)
 
+  const { profile } = useProfile()
   const sessions = useLiveQuery(() => db.sessions.toArray(), [], [] as WorkoutSession[])
   const daily = useLiveQuery(() => db.daily.get(today), [today])
 
@@ -89,9 +91,13 @@ export default function Today() {
         <PageHeader
           title="오늘"
           sub={formatKo(today)}
-          right={<Pill tone={thisWeekCount >= 3 ? 'emerald' : 'slate'}>이번 주 {thisWeekCount}/3~4</Pill>}
+          right={
+            <Pill tone={thisWeekCount >= profile.weeklySessions ? 'emerald' : 'slate'}>
+              이번 주 {thisWeekCount}/{profile.weeklySessions}
+            </Pill>
+          }
         />
-        <EyeRuleBanner />
+        <SafetyBanner profile={profile} />
 
         <SectionTitle right="A → B → A → B 교대">오늘 세션</SectionTitle>
         <div className="flex gap-2">
@@ -135,7 +141,7 @@ export default function Today() {
           세션 {nextType} 시작
         </Button>
 
-        <SectionTitle right={`목표 ${CARDIO.steps.toLocaleString()}보`}>쉬는 날 활동량</SectionTitle>
+        <SectionTitle right={`목표 ${profile.stepGoal.toLocaleString()}보`}>쉬는 날 활동량</SectionTitle>
         <Card>
           <p className="mb-2 text-xs text-slate-500">{CARDIO.restDayNote}</p>
           <NumberField
@@ -179,7 +185,7 @@ export default function Today() {
         />
       </div>
 
-      <EyeRuleBanner />
+      <SafetyBanner profile={profile} />
 
       <button
         onClick={toggleShortMode}
@@ -211,13 +217,14 @@ export default function Today() {
         })}
       </div>
 
-      <textarea
-        value={todaySession.memo ?? ''}
-        onChange={(e) => db.sessions.update(todaySession.id!, { memo: e.target.value })}
-        placeholder="마지막 세트 잔여 느낌, 컨디션 메모…"
-        rows={2}
-        className="mt-4 w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-sm text-slate-200 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
-      />
+      <div className="mt-4">
+        <DraftTextArea
+          value={todaySession.memo ?? ''}
+          onChange={(v) => db.sessions.update(todaySession.id!, { memo: v })}
+          placeholder="마지막 세트 잔여 느낌, 컨디션 메모…"
+          rows={2}
+        />
+      </div>
 
       {!todaySession.finishedAt ? (
         <Button className="mt-3 w-full" onClick={finish}>

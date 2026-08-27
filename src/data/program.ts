@@ -35,7 +35,7 @@ const LEG_RAISE: Omit<Exercise, 'order'> = {
     '꼬리뼈를 천장으로 밀어올리듯 엉덩이를 패드에서 뗀다 — 이 마지막 구간이 핵심',
     '최상단 1초 정지 후 3~4초에 걸쳐 천천히 내린다',
     '허리가 뜨기 전에 멈춘다',
-    '골반 말아올릴 때 "후" 하고 뱉기 (발살바가 가장 걸리기 쉬운 구간)',
+    '골반 말아올릴 때 "후" 하고 뱉기 — 발살바가 가장 걸리기 쉬운 구간',
     '머리가 위쪽인 경사 벤치만 사용. 슬랜트 보드(머리 아래) 배제',
   ],
 }
@@ -98,7 +98,7 @@ export const SESSIONS: Record<SessionType, Session> = {
       {
         id: 'hack-squat', order: 3, name: '핵 스쿼트 (또는 스미스 스쿼트)', muscle: '하체',
         sets: 3, reps: [10, 12], short: 'keep',
-        cues: ['무릎이 안으로 모이지 않게', '벨트 과도한 조임 주의 (복압 → 안압)'],
+        cues: ['무릎이 안으로 모이지 않게', '벨트를 과도하게 조이지 않기 (복압 상승 주의)'],
       },
       {
         id: 'lateral-raise', order: 4, name: '사이드 래터럴 레이즈', muscle: '어깨',
@@ -118,7 +118,7 @@ export const SESSIONS: Record<SessionType, Session> = {
       {
         id: 'overhead-db-extension', order: 7, name: '오버헤드 덤벨 익스텐션', muscle: '삼두',
         sets: 3, reps: [10, 12], short: 'reduce', fixedBlock: true,
-        cues: ['팔꿈치 벌어지지 않게', '머리를 심장보다 낮추지 않는 자세 유지'],
+        cues: ['팔꿈치 벌어지지 않게', '머리가 심장보다 낮아지지 않게 앉거나 서서 수행'],
       },
       { ...LEG_RAISE, order: 8 },
     ],

@@ -1,25 +1,29 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
-import { Card, Pill, SectionTitle } from '../components/ui'
+import { Card, Empty, Pill, SectionTitle } from '../components/ui'
 import {
   APT_CHECK,
   CARDIO,
-  EYE_NOTES,
-  EYE_RULES,
+  DISCLAIMER,
   LEG_RAISE_STAGES,
   PHASES,
   STOP_SIGNALS,
-  TRAINER_SCRIPT,
 } from '../data/guide'
 import { BELLY_FAT_FACTORS } from '../data/nutrition'
 import { SESSIONS } from '../data/program'
+import { buildTrainerScript, phaseWeight } from '../data/profile'
+import { useProfile } from '../hooks/useProfile'
 
 export default function Guide() {
   const [copied, setCopied] = useState(false)
+  const { profile } = useProfile()
+  const script = buildTrainerScript(profile)
 
   const copyScript = async () => {
+    if (!script) return
     try {
-      await navigator.clipboard.writeText(TRAINER_SCRIPT)
+      await navigator.clipboard.writeText(script)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -29,67 +33,92 @@ export default function Guide() {
 
   return (
     <>
-      <PageHeader title="가이드" sub="계획서 요약" />
+      <PageHeader title="가이드" />
 
-      <SectionTitle>안압 관리 4원칙</SectionTitle>
-      <div className="space-y-2">
-        {EYE_RULES.map((r, i) => (
-          <div key={r.title} className="rounded-2xl border border-amber-900/60 bg-amber-950/20 p-4">
-            <p className="text-sm font-semibold text-amber-200">
-              {i + 1}. {r.title}
-            </p>
-            <p className="mt-1 text-xs text-amber-100/70">{r.desc}</p>
-          </div>
-        ))}
-      </div>
-      <ul className="mt-2 space-y-1 px-1 text-xs text-slate-500">
-        {EYE_NOTES.map((n) => (
-          <li key={n}>· {n}</li>
-        ))}
-      </ul>
+      <SectionTitle right={profile.safetyRules.length ? '설정에서 편집' : undefined}>
+        내 안전 수칙
+      </SectionTitle>
+      {profile.safetyRules.length === 0 ? (
+        <Link to="/settings" className="block">
+          <Empty>
+            매 운동에 적용할 수칙을 설정에서 등록하세요.
+            <br />
+            등록하면 운동 화면 최상단에 항상 표시됩니다.
+          </Empty>
+        </Link>
+      ) : (
+        <div className="space-y-2">
+          {profile.conditionLabel?.trim() && (
+            <p className="px-1 text-xs text-amber-400/80">{profile.conditionLabel.trim()}</p>
+          )}
+          {profile.safetyRules.map((r, i) => (
+            <div key={r.title} className="rounded-2xl border border-amber-900/60 bg-amber-950/20 p-4">
+              <p className="text-sm font-semibold text-amber-200">
+                {i + 1}. {r.title}
+              </p>
+              {r.desc && <p className="mt-1 text-xs text-amber-100/70">{r.desc}</p>}
+            </div>
+          ))}
+        </div>
+      )}
 
-      <SectionTitle right={copied ? '복사됨' : undefined}>트레이너에게 전달할 문장</SectionTitle>
-      <Card onClick={copyScript} className="active:bg-slate-800">
-        <p className="text-sm leading-relaxed text-slate-200">"{TRAINER_SCRIPT}"</p>
-        <p className="mt-2 text-xs text-sky-500">탭하면 복사됩니다</p>
-      </Card>
+      {script && (
+        <>
+          <SectionTitle right={copied ? '복사됨' : undefined}>트레이너에게 전달할 문장</SectionTitle>
+          <Card onClick={copyScript} className="active:bg-slate-800">
+            <p className="text-sm leading-relaxed text-slate-200">"{script}"</p>
+            <p className="mt-2 text-xs text-sky-500">탭하면 복사됩니다</p>
+          </Card>
+        </>
+      )}
 
       <SectionTitle>중단 신호</SectionTitle>
       <div className="space-y-2">
         {STOP_SIGNALS.map((s) => (
-          <div
-            key={s.sign}
-            className={`rounded-xl border p-3 ${
-              s.urgent ? 'border-rose-800 bg-rose-950/30' : 'border-slate-800 bg-slate-900/60'
-            }`}
-          >
-            <p className={`text-sm ${s.urgent ? 'font-semibold text-rose-200' : 'text-slate-200'}`}>
-              {s.sign}
-            </p>
-            <p className={`mt-0.5 text-xs ${s.urgent ? 'text-rose-300' : 'text-slate-500'}`}>
-              {s.meaning}
-            </p>
+          <div key={s.sign} className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+            <p className="text-sm text-slate-200">{s.sign}</p>
+            <p className="mt-0.5 text-xs text-slate-500">{s.meaning}</p>
           </div>
         ))}
+        <div className="rounded-xl border border-rose-800 bg-rose-950/30 p-3">
+          <p className="text-sm font-semibold text-rose-200">
+            등록한 이력과 관련된 증상이 나타나면 즉시 중단
+          </p>
+          <p className="mt-0.5 text-xs text-rose-300">
+            운동 중 새로 생긴 증상은 참고 넘기지 말고 해당 진료과에서 확인하세요.
+          </p>
+        </div>
       </div>
 
-      <SectionTitle>레그레이즈 (하복부)</SectionTitle>
+      <SectionTitle right={`현재 ${profile.legRaiseStage}단계`}>레그레이즈 (하복부)</SectionTitle>
       <div className="space-y-2">
-        {LEG_RAISE_STAGES.map((s) => (
-          <div key={s.stage} className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-3">
-            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs tabular-nums text-slate-400">
-              {s.stage}
-            </span>
-            <div>
-              <p className="text-sm text-slate-200">{s.label}</p>
-              <p className="mt-0.5 text-xs text-slate-500">{s.condition}</p>
+        {LEG_RAISE_STAGES.map((s) => {
+          const current = s.stage === profile.legRaiseStage
+          return (
+            <div
+              key={s.stage}
+              className={`flex items-start gap-3 rounded-xl border p-3 ${
+                current ? 'border-sky-700 bg-sky-950/25' : 'border-slate-800 bg-slate-900/60'
+              }`}
+            >
+              <span
+                className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs tabular-nums ${
+                  current ? 'bg-sky-600 text-slate-950' : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {s.stage}
+              </span>
+              <div>
+                <p className={`text-sm ${current ? 'text-sky-100' : 'text-slate-200'}`}>{s.label}</p>
+                <p className="mt-0.5 text-xs text-slate-500">{s.condition}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
       <p className="mt-2 px-1 text-xs text-slate-500">
-        10회 × 3세트가 힘든 현재 상태가 비대에 최적 구간입니다. 중량 추가는 불필요합니다.
-        복근 두께 변화는 최소 3~6개월 단위이고, 건획(복근 칸)의 위치·개수는 유전입니다.
+        복근 두께 변화는 최소 3~6개월 단위로 팔·가슴보다 느립니다. 건획(복근 칸)의 위치·개수는
+        유전이고 두께만 바꿀 수 있습니다. 하복부는 원래 상복부보다 덜 선명합니다.
       </p>
 
       <SectionTitle>골반 전방경사 확인</SectionTitle>
@@ -141,7 +170,7 @@ export default function Guide() {
         <ul className="space-y-1.5 text-xs text-slate-400">
           <li className="flex gap-1.5">
             <span className="text-sky-600">·</span>
-            {CARDIO.restDayNote}
+            쉬는 날 걷기 {profile.stepGoal.toLocaleString()}보 — {CARDIO.restDayNote}
           </li>
           <li className="flex gap-1.5">
             <span className="text-sky-600">·</span>
@@ -166,20 +195,22 @@ export default function Guide() {
 
       <SectionTitle>12주 진행 기준</SectionTitle>
       <div className="space-y-2">
-        {PHASES.map((p) => (
-          <div key={p.weeks} className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
-            <div className="flex items-center gap-2">
-              <Pill tone="sky">{p.weeks}</Pill>
-              {p.weight && <span className="text-xs text-slate-500">{p.weight}</span>}
+        {PHASES.map((p) => {
+          const w = phaseWeight(profile, p.endWeek)
+          return (
+            <div key={p.weeks} className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Pill tone="sky">{p.weeks}</Pill>
+                {w != null && <span className="text-xs text-slate-500">{w}kg 전후</span>}
+              </div>
+              <p className="mt-1.5 text-sm text-slate-300">{p.goal}</p>
             </div>
-            <p className="mt-1.5 text-sm text-slate-300">{p.goal}</p>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <p className="mt-6 rounded-xl bg-slate-900/40 p-3 text-[11px] leading-relaxed text-slate-600">
-        이 앱의 내용은 일반적인 운동·영양 정보이며 의학적 조언이 아닙니다. 망막 관련 운동 허용 범위는
-        수술 방식과 경과에 따라 다르므로 주치의 확인이 필요합니다.
+        {DISCLAIMER}
       </p>
     </>
   )

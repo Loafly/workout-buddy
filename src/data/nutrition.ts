@@ -1,19 +1,10 @@
-export interface MacroTarget {
-  kcal: number
-  protein: number
-  carbs: number
-  fat: number
-}
+/**
+ * 일반적인 영양 참고 정보.
+ * 개인 목표 칼로리·매크로는 프로필(src/data/profile.ts)에서 계산합니다.
+ */
 
-export const TARGETS: Record<'training' | 'rest', MacroTarget> = {
-  training: { kcal: 2400, protein: 165, carbs: 270, fat: 72 },
-  rest: { kcal: 2100, protein: 165, carbs: 190, fat: 72 },
-}
-
-/** 단백질 165g 고정(2.0g/kg). 탄수화물만 조절. 지방은 0.7g/kg 아래로 내리지 않는다 */
 export const NUTRITION_RULES = [
-  '단백질 165g 고정 (2.0g/kg) — 탄수화물만 조절',
-  '지방은 0.7g/kg(약 57g) 아래로 내리지 않기 (호르몬 영향)',
+  '단백질은 체중 기준으로 고정하고 탄수화물만 조절',
   '끼니당 단백질 35~40g × 4회 분할',
   '탄수화물은 운동 전후에 몰아 배치',
   '식이섬유 하루 25~30g',
@@ -29,7 +20,7 @@ export interface MealPreset {
   fat: number
 }
 
-/** 계획서의 하루 식단 예시 — 탭 한 번으로 기록에 넣기 위한 프리셋 */
+/** 빠른 기록용 식단 템플릿 */
 export const MEAL_PRESETS: MealPreset[] = [
   { slot: '아침', desc: '계란 3개 + 오트밀 60g + 그릭요거트 150g', kcal: 620, protein: 42, carbs: 55, fat: 26 },
   { slot: '점심', desc: '현미밥 200g + 닭가슴살 200g + 채소', kcal: 620, protein: 50, carbs: 78, fat: 8 },
@@ -38,7 +29,6 @@ export const MEAL_PRESETS: MealPreset[] = [
   { slot: '야식', desc: '카제인 or 그릭요거트 + 견과 15g', kcal: 280, protein: 28, carbs: 12, fat: 13 },
 ]
 
-/** 단백질 참고표 */
 export const PROTEIN_REFERENCE = [
   ['닭가슴살 150g', 33],
   ['계란 3개', 19],
