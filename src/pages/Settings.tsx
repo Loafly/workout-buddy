@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import PageHeader from '../components/PageHeader'
 import { Button, Card, NumberField, Pill, SectionTitle } from '../components/ui'
 import { Row, TextArea, TextField } from '../components/TextField'
-import { db, exportAll, getSetting, importAll, setSetting } from '../db'
+import BackupPanel from '../components/BackupPanel'
+import { db, getSetting, setSetting } from '../db'
 import { useProfile } from '../hooks/useProfile'
 import {
   buildTrainerScript,
@@ -14,11 +15,11 @@ import {
   type SafetyRule,
 } from '../data/profile'
 import { LEG_RAISE_STAGES } from '../data/guide'
-import { formatKo, toDateKey } from '../lib/date'
+import { formatKo } from '../lib/date'
 
 export default function Settings() {
-  const fileRef = useRef<HTMLInputElement>(null)
   const [msg, setMsg] = useState('')
+  const [confirmWipe, setConfirmWipe] = useState(false)
   const [newRule, setNewRule] = useState<SafetyRule>({ title: '', desc: '' })
   const { profile, save } = useProfile()
   const startDate = useLiveQuery(() => getSetting<string | null>('programStart', null), [], null)
@@ -36,27 +37,6 @@ export default function Settings() {
 
   const removeRule = (title: string) =>
     save({ safetyRules: profile.safetyRules.filter((r) => r.title !== title) })
-
-  const handleExport = async () => {
-    const data = await exportAll()
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `workout-backup-${toDateKey()}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-    setMsg('백업 파일을 내려받았습니다.')
-  }
-
-  const handleImport = async (file: File) => {
-    try {
-      await importAll(JSON.parse(await file.text()))
-      setMsg('복원 완료.')
-    } catch (e) {
-      setMsg(`복원 실패: ${e instanceof Error ? e.message : '파일을 확인해주세요.'}`)
-    }
-  }
 
   const unusedPresets = SAFETY_PRESETS.filter(
     (p) => !profile.safetyRules.some((r) => r.title === p.title),
@@ -230,41 +210,36 @@ export default function Settings() {
         </div>
       </Card>
 
-      <SectionTitle>데이터</SectionTitle>
-      <div className="space-y-2">
-        <Card onClick={handleExport} className="active:bg-zinc-800">
-          <span className="font-medium text-zinc-100">백업</span>
-          <span className="mt-0.5 block text-xs text-zinc-500">프로필·기록 전체를 JSON으로 내보내기</span>
-        </Card>
+      <BackupPanel />
 
-        <Card onClick={() => fileRef.current?.click()} className="active:bg-zinc-800">
-          <span className="font-medium text-zinc-100">복원</span>
-          <span className="mt-0.5 block text-xs text-zinc-500">백업 JSON 불러오기 (기존 데이터를 덮어씁니다)</span>
+      <SectionTitle>초기화</SectionTitle>
+      {confirmWipe ? (
+        <div className="border-l-2 border-rose-600/70 py-2 pl-3">
+          <p className="text-sm text-zinc-200">기록을 전부 삭제할까요?</p>
+          <p className="mt-0.5 text-xs text-zinc-500">되돌릴 수 없습니다. 프로필은 유지됩니다.</p>
+          <div className="mt-2.5 flex gap-2">
+            <Button
+              variant="danger"
+              className="flex-1"
+              onClick={async () => {
+                await Promise.all([db.sessions.clear(), db.meals.clear(), db.daily.clear(), db.body.clear()])
+                setConfirmWipe(false)
+                setMsg('전체 기록을 삭제했습니다.')
+              }}
+            >
+              삭제
+            </Button>
+            <Button variant="ghost" onClick={() => setConfirmWipe(false)}>
+              취소
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Card onClick={() => setConfirmWipe(true)}>
+          <span className="font-medium text-rose-400">전체 기록 삭제</span>
+          <span className="mt-0.5 block text-xs text-zinc-600">프로필은 유지됩니다</span>
         </Card>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            if (f) handleImport(f)
-            e.target.value = ''
-          }}
-        />
-
-        <Card
-          onClick={async () => {
-            if (!confirm('프로필을 제외한 모든 기록을 삭제합니다. 되돌릴 수 없습니다.')) return
-            await Promise.all([db.sessions.clear(), db.meals.clear(), db.daily.clear(), db.body.clear()])
-            setMsg('전체 기록을 삭제했습니다.')
-          }}
-          className="border-transparent bg-zinc-900 active:bg-rose-950/40"
-        >
-          <span className="font-medium text-rose-300">전체 기록 삭제</span>
-          <span className="mt-0.5 block text-xs text-rose-400/60">프로필은 유지됩니다</span>
-        </Card>
-      </div>
+      )}
 
       {msg && <p className="mt-3 px-1 text-xs text-zinc-100">{msg}</p>}
 
