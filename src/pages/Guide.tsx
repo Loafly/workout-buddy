@@ -14,11 +14,16 @@ import { BELLY_FAT_FACTORS } from '../data/nutrition'
 import { SESSIONS } from '../data/program'
 import { buildTrainerScript, phaseWeight } from '../data/profile'
 import { useProfile } from '../hooks/useProfile'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db, type ExerciseLink } from '../db'
+import { searchKo } from '../lib/links'
 
 export default function Guide() {
   const [copied, setCopied] = useState(false)
   const { profile } = useProfile()
   const script = buildTrainerScript(profile)
+  const links = useLiveQuery(() => db.links.toArray(), [], [] as ExerciseLink[])
+  const linkFor = (id: string) => links.find((l) => l.exerciseId === id)?.url
 
   const copyScript = async () => {
     if (!script) return
@@ -144,22 +149,37 @@ export default function Guide() {
               <span className="text-sm font-bold text-zinc-100">세션 {t}</span>
               <Pill>워밍업 사이클 5분 + 동적 스트레칭 3분</Pill>
             </div>
-            <ul className="space-y-1">
-              {SESSIONS[t].exercises.map((e) => (
-                <li key={e.id} className="flex items-baseline gap-2 text-xs">
-                  <span className="w-3 tabular-nums text-zinc-600">{e.order}</span>
-                  <span className={e.fixedBlock ? 'font-medium text-zinc-200' : 'text-zinc-300'}>
-                    {e.name}
-                  </span>
-                  <span className="ml-auto tabular-nums text-zinc-500">
-                    {e.sets}×{e.reps[0] === e.reps[1] ? e.reps[0] : `${e.reps[0]}-${e.reps[1]}`}
-                  </span>
-                </li>
-              ))}
+            <ul>
+              {SESSIONS[t].exercises.map((e) => {
+                const saved = linkFor(e.id)
+                return (
+                  <li key={e.id}>
+                    <a
+                      href={saved ?? searchKo(e)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="-mx-1 flex items-baseline gap-2 rounded px-1 py-1 text-xs active:bg-zinc-800"
+                    >
+                      <span className="w-3 tabular-nums text-zinc-600">{e.order}</span>
+                      <span className={e.fixedBlock ? 'font-medium text-zinc-200' : 'text-zinc-300'}>
+                        {e.name}
+                      </span>
+                      <span className="text-zinc-700">{saved ? '\u25b6' : '\u2197'}</span>
+                      <span className="ml-auto tabular-nums text-zinc-500">
+                        {e.sets}×{e.reps[0] === e.reps[1] ? e.reps[0] : `${e.reps[0]}-${e.reps[1]}`}
+                      </span>
+                    </a>
+                  </li>
+                )
+              })}
             </ul>
           </Card>
         ))}
       </div>
+      <p className="mt-2 px-1 text-xs text-zinc-600">
+        종목을 누르면 영상이 열립니다. ↗ 는 유튜브 검색, ▶ 는 저장해 둔 영상입니다.
+        영상은 운동 화면에서 종목의 "자세 · 영상"을 펼쳐 저장할 수 있습니다.
+      </p>
       <p className="mt-2 px-1 text-xs text-zinc-500">
         6·7·8번(이두/삼두/하복부)은 매 세션 고정 블록입니다. 팔이 지치면 등·프레스 중량이 떨어지고,
         복근이 지치면 척추 안정성이 낮아져 부상 경로가 되므로 마지막에 둡니다.

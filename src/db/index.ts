@@ -71,12 +71,20 @@ export interface Settings {
   value: unknown
 }
 
+/** 종목별로 사용자가 저장해 둔 참고 영상 */
+export interface ExerciseLink {
+  exerciseId: string
+  url: string
+  label?: string
+}
+
 class WorkoutDB extends Dexie {
   sessions!: Table<WorkoutSession, number>
   meals!: Table<Meal, number>
   daily!: Table<DailyLog, string>
   body!: Table<BodyRecord, number>
   settings!: Table<Settings, string>
+  links!: Table<ExerciseLink, string>
 
   constructor() {
     super('workout-buddy')
@@ -86,6 +94,9 @@ class WorkoutDB extends Dexie {
       daily: 'date',
       body: '++id, date',
       settings: 'key',
+    })
+    this.version(2).stores({
+      links: 'exerciseId',
     })
   }
 }
@@ -104,14 +115,15 @@ export const setSetting = (key: string, value: unknown) => db.settings.put({ key
 /* ---------- 백업 / 복원 ---------- */
 
 export async function exportAll() {
-  const [sessions, meals, daily, body, settings] = await Promise.all([
+  const [sessions, meals, daily, body, settings, links] = await Promise.all([
     db.sessions.toArray(),
     db.meals.toArray(),
     db.daily.toArray(),
     db.body.toArray(),
     db.settings.toArray(),
+    db.links.toArray(),
   ])
-  return { version: 1, exportedAt: Date.now(), sessions, meals, daily, body, settings }
+  return { version: 2, exportedAt: Date.now(), sessions, meals, daily, body, settings, links }
 }
 
 export type Backup = Awaited<ReturnType<typeof exportAll>>
@@ -120,18 +132,23 @@ export async function importAll(data: Backup) {
   if (!data || typeof data !== 'object' || !Array.isArray(data.sessions)) {
     throw new Error('백업 파일 형식이 올바르지 않습니다.')
   }
-  await db.transaction('rw', db.sessions, db.meals, db.daily, db.body, db.settings, async () => {
+  // 테이블이 6개라 배열 형태로 넘긴다 (가변 인자 오버로드는 5개까지)
+  const tables = [db.sessions, db.meals, db.daily, db.body, db.settings, db.links]
+  await db.transaction('rw', tables, async () => {
     await Promise.all([
       db.sessions.clear(),
       db.meals.clear(),
       db.daily.clear(),
       db.body.clear(),
       db.settings.clear(),
+      db.links.clear(),
     ])
     await db.sessions.bulkAdd(data.sessions)
     await db.meals.bulkAdd(data.meals ?? [])
     await db.daily.bulkAdd(data.daily ?? [])
     await db.body.bulkAdd(data.body ?? [])
     await db.settings.bulkAdd(data.settings ?? [])
+    // links 는 v2 에서 추가 — 이전 백업에는 없음
+    await db.links.bulkAdd(data.links ?? [])
   })
 }

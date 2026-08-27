@@ -4,6 +4,7 @@ import { repsLabel } from '../data/program'
 import type { ExerciseLog, SetLog } from '../db'
 import { NumberField } from './ui'
 import { formatShort } from '../lib/date'
+import ExerciseVideo from './ExerciseVideo'
 
 interface Props {
   exercise: Exercise
@@ -110,19 +111,22 @@ export default function ExerciseCard({ exercise, entry, targetSets, last, onChan
         <button onClick={addSet} className="active:text-zinc-300">
           세트 추가
         </button>
-        {exercise.cues && (
-          <button onClick={() => setShowCues((v) => !v)} className="ml-auto active:text-zinc-300">
-            {showCues ? '큐 접기' : '자세 큐'}
-          </button>
-        )}
+        <button onClick={() => setShowCues((v) => !v)} className="ml-auto active:text-zinc-300">
+          {showCues ? '접기' : '자세 · 영상'}
+        </button>
       </div>
 
-      {showCues && exercise.cues && (
-        <ul className="mt-2 ml-6 space-y-1 text-xs text-zinc-500">
-          {exercise.cues.map((c) => (
-            <li key={c}>— {c}</li>
-          ))}
-        </ul>
+      {showCues && (
+        <div className="mt-2 ml-6">
+          {exercise.cues && (
+            <ul className="space-y-1 text-xs text-zinc-500">
+              {exercise.cues.map((c) => (
+                <li key={c}>— {c}</li>
+              ))}
+            </ul>
+          )}
+          <ExerciseVideo exercise={exercise} />
+        </div>
       )}
     </section>
   )

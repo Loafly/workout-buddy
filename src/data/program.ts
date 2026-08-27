@@ -6,6 +6,8 @@ export interface Exercise {
   id: string
   order: number
   name: string
+  /** 영상 검색용 영문명 — 한글 검색보다 결과가 정확한 경우가 많음 */
+  en: string
   muscle: Muscle
   sets: number
   /** 목표 반복 구간 [min, max] */
@@ -23,7 +25,7 @@ export interface Session {
 }
 
 const LEG_RAISE: Omit<Exercise, 'order'> = {
-  id: 'incline-leg-raise',
+  id: 'incline-leg-raise', en: 'incline bench leg raise',
   name: '경사 레그레이즈',
   muscle: '복근',
   sets: 3,
@@ -45,37 +47,37 @@ export const SESSIONS: Record<SessionType, Session> = {
     type: 'A',
     exercises: [
       {
-        id: 'machine-chest-press', order: 1, name: '머신 체스트 프레스', muscle: '가슴',
+        id: 'machine-chest-press', en: 'machine chest press', order: 1, name: '머신 체스트 프레스', muscle: '가슴',
         sets: 3, reps: [10, 12], short: 'keep',
         cues: ['손잡이가 가슴 중앙 높이', '어깨 뒤로 내리고 가슴 펴기', '팔꿈치 완전히 잠그지 않기'],
       },
       {
-        id: 'lat-pulldown', order: 2, name: '랫 풀다운', muscle: '등',
+        id: 'lat-pulldown', en: 'lat pulldown', order: 2, name: '랫 풀다운', muscle: '등',
         sets: 3, reps: [10, 12], short: 'keep',
         cues: ['쇄골 쪽으로 당기기 (목 뒤 금지)', '팔꿈치를 아래 주머니에 꽂는 느낌', '상체 15도 기울여 고정'],
       },
       {
-        id: 'leg-press', order: 3, name: '레그 프레스', muscle: '하체',
+        id: 'leg-press', en: 'leg press', order: 3, name: '레그 프레스', muscle: '하체',
         sets: 3, reps: [12, 15], short: 'keep',
         cues: ['무릎 90도까지만', '엉덩이 뜨면 너무 깊음', '무릎이 안으로 모이지 않게', '등받이 각도는 세울 것'],
       },
       {
-        id: 'machine-shoulder-press', order: 4, name: '머신 숄더 프레스', muscle: '어깨',
+        id: 'machine-shoulder-press', en: 'machine shoulder press', order: 4, name: '머신 숄더 프레스', muscle: '어깨',
         sets: 3, reps: [10, 12], short: 'cut',
         cues: ['손잡이가 귀~어깨 높이', '허리가 등받이에서 뜨면 중량 과다'],
       },
       {
-        id: 'leg-curl', order: 5, name: '레그 컬', muscle: '하체',
+        id: 'leg-curl', en: 'leg curl', order: 5, name: '레그 컬', muscle: '하체',
         sets: 3, reps: [12, 15], short: 'cut',
         cues: ['관절 축과 기계 회전축 일치 확인', '내릴 때 3초에 걸쳐 천천히'],
       },
       {
-        id: 'dumbbell-curl', order: 6, name: '덤벨 컬', muscle: '이두',
+        id: 'dumbbell-curl', en: 'dumbbell curl', order: 6, name: '덤벨 컬', muscle: '이두',
         sets: 3, reps: [10, 12], short: 'reduce', fixedBlock: true,
         cues: ['반동 금지', '팔꿈치 고정'],
       },
       {
-        id: 'triceps-pushdown', order: 7, name: '삼두 푸시다운', muscle: '삼두',
+        id: 'triceps-pushdown', en: 'triceps pushdown', order: 7, name: '삼두 푸시다운', muscle: '삼두',
         sets: 3, reps: [10, 12], short: 'reduce', fixedBlock: true,
         cues: ['팔꿈치를 옆구리에 붙여 고정', '미는 구간에서 "후" 뱉기'],
       },
@@ -86,37 +88,37 @@ export const SESSIONS: Record<SessionType, Session> = {
     type: 'B',
     exercises: [
       {
-        id: 'seated-cable-row', order: 1, name: '시티드 케이블 로우', muscle: '등',
+        id: 'seated-cable-row', en: 'seated cable row', order: 1, name: '시티드 케이블 로우', muscle: '등',
         sets: 3, reps: [10, 12], short: 'keep',
         cues: ['허리 굽히지 않기', '날개뼈를 먼저 붙이고 팔은 그다음'],
       },
       {
-        id: 'incline-db-press', order: 2, name: '인클라인 덤벨 프레스', muscle: '가슴',
+        id: 'incline-db-press', en: 'incline dumbbell press', order: 2, name: '인클라인 덤벨 프레스', muscle: '가슴',
         sets: 3, reps: [10, 12], short: 'keep',
         cues: ['벤치 30~40도', '어깨 뒤로 내리고 가슴 펴기', '미는 구간에서 반드시 숨 뱉기'],
       },
       {
-        id: 'hack-squat', order: 3, name: '핵 스쿼트 (또는 스미스 스쿼트)', muscle: '하체',
+        id: 'hack-squat', en: 'hack squat', order: 3, name: '핵 스쿼트 (또는 스미스 스쿼트)', muscle: '하체',
         sets: 3, reps: [10, 12], short: 'keep',
         cues: ['무릎이 안으로 모이지 않게', '벨트를 과도하게 조이지 않기 (복압 상승 주의)'],
       },
       {
-        id: 'lateral-raise', order: 4, name: '사이드 래터럴 레이즈', muscle: '어깨',
+        id: 'lateral-raise', en: 'dumbbell lateral raise', order: 4, name: '사이드 래터럴 레이즈', muscle: '어깨',
         sets: 3, reps: [15, 15], short: 'cut',
         cues: ['반동 금지', '어깨 높이까지만'],
       },
       {
-        id: 'leg-extension', order: 5, name: '레그 익스텐션', muscle: '하체',
+        id: 'leg-extension', en: 'leg extension', order: 5, name: '레그 익스텐션', muscle: '하체',
         sets: 3, reps: [12, 15], short: 'cut',
         cues: ['관절 축과 기계 회전축 일치 확인', '내릴 때 3초에 걸쳐 천천히'],
       },
       {
-        id: 'hammer-curl', order: 6, name: '해머 컬', muscle: '이두',
+        id: 'hammer-curl', en: 'hammer curl', order: 6, name: '해머 컬', muscle: '이두',
         sets: 3, reps: [10, 12], short: 'reduce', fixedBlock: true,
         cues: ['반동 금지', '팔꿈치 고정'],
       },
       {
-        id: 'overhead-db-extension', order: 7, name: '오버헤드 덤벨 익스텐션', muscle: '삼두',
+        id: 'overhead-db-extension', en: 'overhead dumbbell triceps extension', order: 7, name: '오버헤드 덤벨 익스텐션', muscle: '삼두',
         sets: 3, reps: [10, 12], short: 'reduce', fixedBlock: true,
         cues: ['팔꿈치 벌어지지 않게', '머리가 심장보다 낮아지지 않게 앉거나 서서 수행'],
       },
