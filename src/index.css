@@ -4,8 +4,18 @@
   color-scheme: dark;
 }
 
-html, body, #root {
+html, body {
   height: 100%;
+}
+
+/*
+ * iOS 사파리에서 100%는 툴바를 포함한 높이라 하단 탭바가 툴바 뒤로 밀려납니다.
+ * dvh(실제 보이는 뷰포트 높이)로 고정하고, 미지원 브라우저는 vh로 폴백.
+ */
+#root {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 body {
