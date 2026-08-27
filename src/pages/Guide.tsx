@@ -52,7 +52,7 @@ export default function Guide() {
             <p className="px-1 text-xs text-amber-400/80">{profile.conditionLabel.trim()}</p>
           )}
           {profile.safetyRules.map((r, i) => (
-            <div key={r.title} className="rounded-2xl border border-amber-900/60 bg-amber-950/20 p-4">
+            <div key={r.title} className="rounded-lg border border-l-2 border-amber-600/70 p-4">
               <p className="text-sm font-semibold text-amber-200">
                 {i + 1}. {r.title}
               </p>
@@ -65,9 +65,9 @@ export default function Guide() {
       {script && (
         <>
           <SectionTitle right={copied ? '복사됨' : undefined}>트레이너에게 전달할 문장</SectionTitle>
-          <Card onClick={copyScript} className="active:bg-slate-800">
-            <p className="text-sm leading-relaxed text-slate-200">"{script}"</p>
-            <p className="mt-2 text-xs text-sky-500">탭하면 복사됩니다</p>
+          <Card onClick={copyScript} className="active:bg-zinc-800">
+            <p className="text-sm leading-relaxed text-zinc-200">"{script}"</p>
+            <p className="mt-2 text-xs text-zinc-400">탭하면 복사됩니다</p>
           </Card>
         </>
       )}
@@ -75,16 +75,16 @@ export default function Guide() {
       <SectionTitle>중단 신호</SectionTitle>
       <div className="space-y-2">
         {STOP_SIGNALS.map((s) => (
-          <div key={s.sign} className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
-            <p className="text-sm text-slate-200">{s.sign}</p>
-            <p className="mt-0.5 text-xs text-slate-500">{s.meaning}</p>
+          <div key={s.sign} className="rounded-lg bg-zinc-900/60 p-3">
+            <p className="text-sm text-zinc-200">{s.sign}</p>
+            <p className="mt-0.5 text-xs text-zinc-500">{s.meaning}</p>
           </div>
         ))}
-        <div className="rounded-xl border border-rose-800 bg-rose-950/30 p-3">
-          <p className="text-sm font-semibold text-rose-200">
+        <div className="mt-1 border-l-2 border-rose-600/70 py-1 pl-3">
+          <p className="text-sm font-medium text-rose-300">
             등록한 이력과 관련된 증상이 나타나면 즉시 중단
           </p>
-          <p className="mt-0.5 text-xs text-rose-300">
+          <p className="mt-0.5 text-xs text-zinc-500">
             운동 중 새로 생긴 증상은 참고 넘기지 말고 해당 진료과에서 확인하세요.
           </p>
         </div>
@@ -97,38 +97,38 @@ export default function Guide() {
           return (
             <div
               key={s.stage}
-              className={`flex items-start gap-3 rounded-xl border p-3 ${
-                current ? 'border-sky-700 bg-sky-950/25' : 'border-slate-800 bg-slate-900/60'
+              className={`flex items-start gap-3 rounded-lg border p-3 ${
+                current ? 'border-zinc-600 bg-zinc-800/50' : 'border-zinc-800 bg-zinc-900/60'
               }`}
             >
               <span
                 className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs tabular-nums ${
-                  current ? 'bg-sky-600 text-slate-950' : 'bg-slate-800 text-slate-400'
+                  current ? 'bg-zinc-100 text-zinc-950' : 'bg-zinc-800 text-zinc-400'
                 }`}
               >
                 {s.stage}
               </span>
               <div>
-                <p className={`text-sm ${current ? 'text-sky-100' : 'text-slate-200'}`}>{s.label}</p>
-                <p className="mt-0.5 text-xs text-slate-500">{s.condition}</p>
+                <p className={`text-sm ${current ? 'text-zinc-100' : 'text-zinc-200'}`}>{s.label}</p>
+                <p className="mt-0.5 text-xs text-zinc-500">{s.condition}</p>
               </div>
             </div>
           )
         })}
       </div>
-      <p className="mt-2 px-1 text-xs text-slate-500">
+      <p className="mt-2 px-1 text-xs text-zinc-500">
         복근 두께 변화는 최소 3~6개월 단위로 팔·가슴보다 느립니다. 건획(복근 칸)의 위치·개수는
         유전이고 두께만 바꿀 수 있습니다. 하복부는 원래 상복부보다 덜 선명합니다.
       </p>
 
       <SectionTitle>골반 전방경사 확인</SectionTitle>
       <Card>
-        <p className="text-sm text-slate-200">{APT_CHECK.test}</p>
-        <p className="mt-2 text-xs text-slate-500">{APT_CHECK.why}</p>
-        <ul className="mt-3 space-y-1 text-xs text-slate-400">
+        <p className="text-sm text-zinc-200">{APT_CHECK.test}</p>
+        <p className="mt-2 text-xs text-zinc-500">{APT_CHECK.why}</p>
+        <ul className="mt-3 space-y-1 text-xs text-zinc-400">
           {APT_CHECK.fix.map((f) => (
             <li key={f} className="flex gap-1.5">
-              <span className="text-sky-600">·</span>
+              <span className="text-zinc-700">—</span>
               {f}
             </li>
           ))}
@@ -141,17 +141,17 @@ export default function Guide() {
         {(['A', 'B'] as const).map((t) => (
           <Card key={t}>
             <div className="mb-2 flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-100">세션 {t}</span>
+              <span className="text-sm font-bold text-zinc-100">세션 {t}</span>
               <Pill>워밍업 사이클 5분 + 동적 스트레칭 3분</Pill>
             </div>
             <ul className="space-y-1">
               {SESSIONS[t].exercises.map((e) => (
                 <li key={e.id} className="flex items-baseline gap-2 text-xs">
-                  <span className="w-3 tabular-nums text-slate-600">{e.order}</span>
-                  <span className={e.fixedBlock ? 'font-medium text-sky-300' : 'text-slate-300'}>
+                  <span className="w-3 tabular-nums text-zinc-600">{e.order}</span>
+                  <span className={e.fixedBlock ? 'font-medium text-zinc-200' : 'text-zinc-300'}>
                     {e.name}
                   </span>
-                  <span className="ml-auto tabular-nums text-slate-500">
+                  <span className="ml-auto tabular-nums text-zinc-500">
                     {e.sets}×{e.reps[0] === e.reps[1] ? e.reps[0] : `${e.reps[0]}-${e.reps[1]}`}
                   </span>
                 </li>
@@ -160,24 +160,24 @@ export default function Guide() {
           </Card>
         ))}
       </div>
-      <p className="mt-2 px-1 text-xs text-slate-500">
+      <p className="mt-2 px-1 text-xs text-zinc-500">
         6·7·8번(이두/삼두/하복부)은 매 세션 고정 블록입니다. 팔이 지치면 등·프레스 중량이 떨어지고,
         복근이 지치면 척추 안정성이 낮아져 부상 경로가 되므로 마지막에 둡니다.
       </p>
 
       <SectionTitle>유산소 · 활동량</SectionTitle>
       <Card>
-        <ul className="space-y-1.5 text-xs text-slate-400">
+        <ul className="space-y-1.5 text-xs text-zinc-400">
           <li className="flex gap-1.5">
-            <span className="text-sky-600">·</span>
+            <span className="text-zinc-700">—</span>
             쉬는 날 걷기 {profile.stepGoal.toLocaleString()}보 — {CARDIO.restDayNote}
           </li>
           <li className="flex gap-1.5">
-            <span className="text-sky-600">·</span>
+            <span className="text-zinc-700">—</span>
             {CARDIO.extra}
           </li>
           <li className="flex gap-1.5">
-            <span className="text-sky-600">·</span>
+            <span className="text-zinc-700">—</span>
             {CARDIO.running}
           </li>
         </ul>
@@ -186,9 +186,9 @@ export default function Guide() {
       <SectionTitle>복부지방에 특히 영향이 큰 요소</SectionTitle>
       <div className="space-y-2">
         {BELLY_FAT_FACTORS.map((f) => (
-          <div key={f.factor} className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
-            <p className="text-sm text-slate-200">{f.factor}</p>
-            <p className="mt-0.5 text-xs text-slate-500">{f.reason}</p>
+          <div key={f.factor} className="rounded-lg bg-zinc-900/60 px-4 py-3">
+            <p className="text-sm text-zinc-200">{f.factor}</p>
+            <p className="mt-0.5 text-xs text-zinc-500">{f.reason}</p>
           </div>
         ))}
       </div>
@@ -198,18 +198,18 @@ export default function Guide() {
         {PHASES.map((p) => {
           const w = phaseWeight(profile, p.endWeek)
           return (
-            <div key={p.weeks} className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+            <div key={p.weeks} className="rounded-lg bg-zinc-900/60 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Pill tone="sky">{p.weeks}</Pill>
-                {w != null && <span className="text-xs text-slate-500">{w}kg 전후</span>}
+                {w != null && <span className="text-xs text-zinc-500">{w}kg 전후</span>}
               </div>
-              <p className="mt-1.5 text-sm text-slate-300">{p.goal}</p>
+              <p className="mt-1.5 text-sm text-zinc-300">{p.goal}</p>
             </div>
           )
         })}
       </div>
 
-      <p className="mt-6 rounded-xl bg-slate-900/40 p-3 text-[11px] leading-relaxed text-slate-600">
+      <p className="mt-6 rounded-lg bg-zinc-900/40 p-3 text-[11px] leading-relaxed text-zinc-600">
         {DISCLAIMER}
       </p>
     </>

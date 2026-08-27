@@ -10,10 +10,10 @@ export default function PageHeader({
   right?: ReactNode
 }) {
   return (
-    <header className="safe-top flex items-start justify-between pt-6 pb-4">
+    <header className="safe-top flex items-baseline justify-between pt-7 pb-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-100">{title}</h1>
-        {sub && <p className="mt-1 text-sm text-slate-400">{sub}</p>}
+        <h1 className="text-[26px] leading-none font-semibold tracking-tight text-zinc-50">{title}</h1>
+        {sub && <p className="mt-2 text-[13px] text-zinc-500">{sub}</p>}
       </div>
       {right}
     </header>

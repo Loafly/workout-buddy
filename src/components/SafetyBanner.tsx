@@ -12,44 +12,33 @@ export default function SafetyBanner({ profile }: { profile: Profile }) {
 
   if (!rules.length) {
     return (
-      <Link
-        to="/settings"
-        className="block rounded-2xl border border-dashed border-slate-700 px-4 py-3 text-xs text-slate-500"
-      >
-        매 운동에 적용할 안전 수칙을 설정에서 등록하면 여기에 항상 표시됩니다.
+      <Link to="/settings" className="block py-2 text-xs text-zinc-600 underline underline-offset-4">
+        매 운동에 적용할 안전 수칙 등록하기
       </Link>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-amber-900/60 bg-amber-950/25">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-left"
-      >
-        <span className="text-base">⚠️</span>
-        <span className="flex-1 text-sm font-medium text-amber-200">
-          {profile.conditionLabel?.trim() ? `${profile.conditionLabel.trim()} — 안전 수칙` : '안전 수칙'}
-        </span>
-        <span className="text-xs text-amber-500/80">{open ? '접기' : '펼치기'}</span>
-      </button>
-      {open ? (
-        <ol className="space-y-2 px-4 pb-4 text-xs text-amber-100/80">
-          {rules.map((r, i) => (
-            <li key={r.title} className="flex gap-2">
-              <span className="text-amber-500/70">{i + 1}.</span>
-              <span>
-                <b className="text-amber-200">{r.title}</b>
-                {r.desc && ` — ${r.desc}`}
-              </span>
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <p className="truncate px-4 pb-3 text-xs text-amber-100/70">
-          {rules.map((r) => r.title).join(' · ')}
+    <div className="border-l-2 border-amber-600/70 pl-3">
+      <button onClick={() => setOpen((v) => !v)} className="w-full text-left">
+        <p className="text-[11px] tracking-wide text-amber-600/90 uppercase">
+          {profile.conditionLabel?.trim() || '안전 수칙'}
         </p>
-      )}
+        {open ? (
+          <ol className="mt-1.5 space-y-1.5 text-xs text-zinc-400">
+            {rules.map((r) => (
+              <li key={r.title}>
+                <span className="text-zinc-200">{r.title}</span>
+                {r.desc && <span className="text-zinc-600"> — {r.desc}</span>}
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="mt-0.5 truncate text-xs text-zinc-500">
+            {rules.map((r) => r.title).join(' · ')}
+          </p>
+        )}
+      </button>
     </div>
   )
 }

@@ -81,7 +81,7 @@ export default function Settings() {
           <NumberField value={profile.goalWeightKg ?? null} onChange={(v) => save({ goalWeightKg: v ?? undefined })} placeholder="70" suffix="kg" step={0.1} />
         </Row>
         <div className="pt-2">
-          <p className="mb-1.5 text-sm text-slate-300">운동 경력 · 공백</p>
+          <p className="mb-1.5 text-sm text-zinc-300">운동 경력 · 공백</p>
           <TextArea
             value={profile.background ?? ''}
             onChange={(v) => save({ background: v })}
@@ -107,14 +107,14 @@ export default function Settings() {
         </Row>
 
         {w ? (
-          <div className="mt-3 space-y-1.5 rounded-xl bg-slate-950/60 p-3 text-xs tabular-nums">
-            <p className="text-slate-400">
-              운동일 <span className="text-slate-200">{training.kcal}kcal</span> · P{training.protein} C{training.carbs} F{training.fat}
+          <div className="mt-3 space-y-1.5 rounded-lg bg-zinc-950/60 p-3 text-xs tabular-nums">
+            <p className="text-zinc-400">
+              운동일 <span className="text-zinc-200">{training.kcal}kcal</span> · P{training.protein} C{training.carbs} F{training.fat}
             </p>
-            <p className="text-slate-400">
-              휴식일 <span className="text-slate-200">{rest.kcal}kcal</span> · P{rest.protein} C{rest.carbs} F{rest.fat}
+            <p className="text-zinc-400">
+              휴식일 <span className="text-zinc-200">{rest.kcal}kcal</span> · P{rest.protein} C{rest.carbs} F{rest.fat}
             </p>
-            <p className="text-slate-600">단백질·지방은 고정되고 탄수화물이 남은 칼로리로 계산됩니다.</p>
+            <p className="text-zinc-600">단백질·지방은 고정되고 탄수화물이 남은 칼로리로 계산됩니다.</p>
           </div>
         ) : (
           <p className="mt-3 text-xs text-amber-400/80">체중을 입력해야 매크로가 계산됩니다.</p>
@@ -136,12 +136,12 @@ export default function Settings() {
 
       <SectionTitle right={`${profile.safetyRules.length}개`}>안전 수칙</SectionTitle>
       <Card>
-        <p className="mb-3 text-xs text-slate-500">
+        <p className="mb-3 text-xs text-zinc-500">
           매 운동에 적용할 제약입니다. 등록하면 운동 화면 최상단에 항상 표시됩니다.
         </p>
 
         <div className="mb-3">
-          <p className="mb-1.5 text-sm text-slate-300">주의가 필요한 이력 · 상태</p>
+          <p className="mb-1.5 text-sm text-zinc-300">주의가 필요한 이력 · 상태</p>
           <TextField
             value={profile.conditionLabel ?? ''}
             onChange={(v) => save({ conditionLabel: v })}
@@ -153,13 +153,13 @@ export default function Settings() {
         {profile.safetyRules.length > 0 && (
           <ul className="mb-3 space-y-2">
             {profile.safetyRules.map((r, i) => (
-              <li key={r.title} className="flex items-start gap-2 rounded-xl bg-slate-950/60 p-3">
-                <span className="text-xs tabular-nums text-slate-600">{i + 1}</span>
+              <li key={r.title} className="flex items-start gap-2 rounded-lg bg-zinc-950/60 p-3">
+                <span className="text-xs tabular-nums text-zinc-600">{i + 1}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-slate-200">{r.title}</p>
-                  {r.desc && <p className="mt-0.5 text-xs text-slate-500">{r.desc}</p>}
+                  <p className="text-sm text-zinc-200">{r.title}</p>
+                  {r.desc && <p className="mt-0.5 text-xs text-zinc-500">{r.desc}</p>}
                 </div>
-                <button onClick={() => removeRule(r.title)} className="shrink-0 text-xs text-slate-600 active:text-rose-400">
+                <button onClick={() => removeRule(r.title)} className="shrink-0 text-xs text-zinc-600 active:text-rose-400">
                   삭제
                 </button>
               </li>
@@ -169,13 +169,13 @@ export default function Settings() {
 
         {unusedPresets.length > 0 && (
           <>
-            <p className="mb-1.5 text-xs text-slate-500">일반 수칙에서 고르기</p>
+            <p className="mb-1.5 text-xs text-zinc-500">일반 수칙에서 고르기</p>
             <div className="mb-3 flex flex-wrap gap-1.5">
               {unusedPresets.map((p) => (
                 <button
                   key={p.title}
                   onClick={() => addRule(p)}
-                  className="rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs text-slate-300 active:bg-slate-800"
+                  className="rounded-md bg-zinc-900 px-2.5 py-1.5 text-xs text-zinc-300 active:bg-zinc-800"
                 >
                   + {p.title}
                 </button>
@@ -209,7 +209,7 @@ export default function Settings() {
           placeholder={buildTrainerScript({ ...profile, trainerScript: undefined }) || '위 항목을 채우면 자동으로 만들어집니다.'}
           rows={3}
         />
-        <p className="mt-2 text-xs text-slate-600">
+        <p className="mt-2 text-xs text-zinc-600">
           비워두면 이력·수칙을 조합해 자동으로 만들어집니다. 가이드 탭에서 탭 한 번으로 복사할 수 있습니다.
         </p>
       </Card>
@@ -218,28 +218,28 @@ export default function Settings() {
       <Card>
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <p className="text-sm text-slate-200">12주 프로그램 시작일</p>
-            <p className="mt-0.5 text-xs text-slate-500">{startDate ? formatKo(startDate) : '미설정'}</p>
+            <p className="text-sm text-zinc-200">12주 프로그램 시작일</p>
+            <p className="mt-0.5 text-xs text-zinc-500">{startDate ? formatKo(startDate) : '미설정'}</p>
           </div>
           <input
             type="date"
             value={startDate ?? ''}
             onChange={(e) => setSetting('programStart', e.target.value || null)}
-            className="rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-200 focus:border-sky-500 focus:outline-none"
+            className="rounded-md bg-zinc-950 px-2.5 py-2 text-sm text-zinc-100 outline-none ring-1 ring-zinc-800 placeholder:text-zinc-700 focus:ring-zinc-500"
           />
         </div>
       </Card>
 
       <SectionTitle>데이터</SectionTitle>
       <div className="space-y-2">
-        <Card onClick={handleExport} className="active:bg-slate-800">
-          <span className="font-medium text-slate-100">백업</span>
-          <span className="mt-0.5 block text-xs text-slate-500">프로필·기록 전체를 JSON으로 내보내기</span>
+        <Card onClick={handleExport} className="active:bg-zinc-800">
+          <span className="font-medium text-zinc-100">백업</span>
+          <span className="mt-0.5 block text-xs text-zinc-500">프로필·기록 전체를 JSON으로 내보내기</span>
         </Card>
 
-        <Card onClick={() => fileRef.current?.click()} className="active:bg-slate-800">
-          <span className="font-medium text-slate-100">복원</span>
-          <span className="mt-0.5 block text-xs text-slate-500">백업 JSON 불러오기 (기존 데이터를 덮어씁니다)</span>
+        <Card onClick={() => fileRef.current?.click()} className="active:bg-zinc-800">
+          <span className="font-medium text-zinc-100">복원</span>
+          <span className="mt-0.5 block text-xs text-zinc-500">백업 JSON 불러오기 (기존 데이터를 덮어씁니다)</span>
         </Card>
         <input
           ref={fileRef}
@@ -259,22 +259,22 @@ export default function Settings() {
             await Promise.all([db.sessions.clear(), db.meals.clear(), db.daily.clear(), db.body.clear()])
             setMsg('전체 기록을 삭제했습니다.')
           }}
-          className="border-rose-900/60 bg-rose-950/20 active:bg-rose-950/40"
+          className="border-transparent bg-zinc-900 active:bg-rose-950/40"
         >
           <span className="font-medium text-rose-300">전체 기록 삭제</span>
           <span className="mt-0.5 block text-xs text-rose-400/60">프로필은 유지됩니다</span>
         </Card>
       </div>
 
-      {msg && <p className="mt-3 px-1 text-xs text-sky-400">{msg}</p>}
+      {msg && <p className="mt-3 px-1 text-xs text-zinc-100">{msg}</p>}
 
       <div className="mt-6 flex items-center gap-2 px-1">
         <Pill>로컬 전용</Pill>
-        <p className="text-[11px] text-slate-600">
+        <p className="text-[11px] text-zinc-600">
           입력한 신체·건강 정보는 서버로 전송되지 않고 이 브라우저에만 저장됩니다.
         </p>
       </div>
-      <p className="mt-3 px-1 text-[11px] leading-relaxed text-slate-600">
+      <p className="mt-3 px-1 text-[11px] leading-relaxed text-zinc-600">
         기기를 바꾸거나 브라우저 데이터를 지우면 기록이 사라집니다. 주기적으로 백업을 받아두세요.
       </p>
     </>

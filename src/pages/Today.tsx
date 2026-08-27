@@ -105,17 +105,17 @@ export default function Today() {
             <button
               key={t}
               onClick={() => setPickedType(t)}
-              className={`flex-1 rounded-2xl border p-4 text-left transition-colors ${
+              className={`flex-1 rounded-lg border p-4 text-left transition-colors ${
                 nextType === t
-                  ? 'border-sky-500 bg-sky-500/10'
-                  : 'border-slate-800 bg-slate-900/60'
+                  ? 'border-zinc-500 bg-zinc-800/60'
+                  : 'border-zinc-800 bg-zinc-900/60'
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-slate-100">세션 {t}</span>
+                <span className="text-lg font-bold text-zinc-100">세션 {t}</span>
                 {nextType === t && !pickedType && <Pill tone="sky">추천</Pill>}
               </div>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-zinc-500">
                 {SESSIONS[t].exercises
                   .slice(0, 3)
                   .map((e) => e.name)
@@ -126,15 +126,15 @@ export default function Today() {
           ))}
         </div>
 
-        <label className="mt-3 flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+        <label className="mt-3 flex items-center gap-3 rounded-lg bg-zinc-900/70 px-4 py-3">
           <input
             type="checkbox"
             checked={short}
             onChange={(e) => setShort(e.target.checked)}
-            className="h-4 w-4 accent-sky-500"
+            className="h-4 w-4 accent-zinc-300"
           />
-          <span className="flex-1 text-sm text-slate-200">40분 컷</span>
-          <span className="text-xs text-slate-500">4·5번 제외, 고정 블록 2세트</span>
+          <span className="flex-1 text-sm text-zinc-200">40분 컷</span>
+          <span className="text-xs text-zinc-500">4·5번 제외, 고정 블록 2세트</span>
         </label>
 
         <Button className="mt-3 w-full" onClick={() => start(nextType, short)}>
@@ -143,7 +143,7 @@ export default function Today() {
 
         <SectionTitle right={`목표 ${profile.stepGoal.toLocaleString()}보`}>쉬는 날 활동량</SectionTitle>
         <Card>
-          <p className="mb-2 text-xs text-slate-500">{CARDIO.restDayNote}</p>
+          <p className="mb-2 text-xs text-zinc-500">{CARDIO.restDayNote}</p>
           <NumberField
             value={daily?.steps ?? null}
             onChange={saveSteps}
@@ -178,26 +178,23 @@ export default function Today() {
         }
       />
 
-      <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-slate-800">
-        <div
-          className="h-full rounded-full bg-sky-500 transition-all"
-          style={{ width: `${pct}%` }}
-        />
+      <div className="mb-4 h-px bg-zinc-800">
+        <div className="h-full bg-zinc-100 transition-all" style={{ width: `${pct}%` }} />
       </div>
 
       <SafetyBanner profile={profile} />
 
       <button
         onClick={toggleShortMode}
-        className="mt-3 flex w-full items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-2.5 text-left"
+        className="mt-3 flex w-full items-center gap-3 rounded-lg bg-zinc-900/70 px-4 py-2.5 text-left"
       >
         <span
           className={`h-4 w-4 rounded border ${
-            todaySession.short ? 'border-sky-500 bg-sky-500' : 'border-slate-600'
+            todaySession.short ? 'border-zinc-500 bg-zinc-100' : 'border-zinc-600'
           }`}
         />
-        <span className="flex-1 text-sm text-slate-200">40분 컷</span>
-        <span className="text-xs text-slate-500">1·2·3 유지 / 6·7·8 축소 / 4·5 제외</span>
+        <span className="flex-1 text-sm text-zinc-200">40분 컷</span>
+        <span className="text-xs text-zinc-500">1·2·3 유지 / 6·7·8 축소 / 4·5 제외</span>
       </button>
 
       <div className="mt-4 space-y-3">

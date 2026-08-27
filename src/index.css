@@ -1,12 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --color-bg: #0b1120;
-  --color-surface: #111a2e;
-  --color-line: #1e293b;
-  --color-accent: #38bdf8;
-}
-
 :root {
   color-scheme: dark;
 }
@@ -16,13 +9,26 @@ html, body, #root {
 }
 
 body {
-  background: var(--color-bg);
-  color: #e2e8f0;
+  background: #0a0a0b;
+  color: #ededee;
   font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* iOS 홈 화면 앱 모드에서 노치/홈바 대응 */
+/* 숫자는 자리수가 흔들리지 않게 */
+input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 스피너 제거 — 모바일에서 폭만 잡아먹음 */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; }
+
 .safe-top { padding-top: env(safe-area-inset-top); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }

@@ -58,10 +58,10 @@ export default function History() {
           <div className="flex items-center gap-2">
             <Pill tone="sky">{phase.weeks}</Pill>
             {phaseWeight(profile, phase.endWeek) != null && (
-              <span className="text-xs text-slate-500">목표 {phaseWeight(profile, phase.endWeek)}kg 전후</span>
+              <span className="text-xs text-zinc-500">목표 {phaseWeight(profile, phase.endWeek)}kg 전후</span>
             )}
           </div>
-          <p className="mt-2 text-sm text-slate-200">{phase.goal}</p>
+          <p className="mt-2 text-sm text-zinc-200">{phase.goal}</p>
         </Card>
       )}
 
@@ -72,17 +72,17 @@ export default function History() {
         <div className="space-y-2">
           {Object.entries(VOLUME_RANGE).map(([muscle, [lo, hi]]) => {
             const v = volume[muscle as keyof typeof volume] ?? 0
-            const tone = v === 0 ? 'bg-slate-700' : v < lo ? 'bg-amber-500' : v > hi ? 'bg-rose-500' : 'bg-emerald-500'
+            const tone = v === 0 ? 'bg-zinc-700' : v < lo ? 'bg-amber-500' : v > hi ? 'bg-rose-500' : 'bg-emerald-500'
             return (
               <div key={muscle} className="flex items-center gap-3">
-                <span className="w-10 shrink-0 text-xs text-slate-400">{muscle}</span>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+                <span className="w-10 shrink-0 text-xs text-zinc-400">{muscle}</span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
                   <div
                     className={`h-full rounded-full ${tone}`}
                     style={{ width: `${Math.min(100, (v / hi) * 100)}%` }}
                   />
                 </div>
-                <span className="w-16 shrink-0 text-right text-xs tabular-nums text-slate-500">
+                <span className="w-16 shrink-0 text-right text-xs tabular-nums text-zinc-500">
                   {v} / {lo}~{hi}
                 </span>
               </div>
@@ -103,11 +103,11 @@ export default function History() {
 
         {avgs.length > 0 && (
           <div className="mt-4 space-y-1">
-            <p className="text-xs text-slate-500">주 평균 체중</p>
+            <p className="text-xs text-zinc-500">주 평균 체중</p>
             {avgs.slice(-6).map((a) => (
               <div key={a.week} className="flex items-baseline gap-2 text-sm">
-                <span className="w-14 text-xs tabular-nums text-slate-500">{formatShort(a.week)}~</span>
-                <span className="tabular-nums text-slate-200">{a.avg.toFixed(1)}kg</span>
+                <span className="w-14 text-xs tabular-nums text-zinc-500">{formatShort(a.week)}~</span>
+                <span className="tabular-nums text-zinc-200">{a.avg.toFixed(1)}kg</span>
               </div>
             ))}
           </div>
@@ -117,10 +117,10 @@ export default function History() {
           <p
             className={`mt-3 rounded-lg p-2.5 text-xs ${
               lossRate > 0.5
-                ? 'bg-amber-950/30 text-amber-300'
+                ? 'bg-zinc-900 text-amber-300'
                 : lossRate < 0
-                  ? 'bg-slate-800/50 text-slate-400'
-                  : 'bg-emerald-950/30 text-emerald-300'
+                  ? 'bg-zinc-800/50 text-zinc-400'
+                  : 'bg-zinc-900 text-emerald-300'
             }`}
           >
             지난주 대비 {lossRate >= 0 ? '-' : '+'}
@@ -137,9 +137,9 @@ export default function History() {
       {sortedBody.length > 0 && (
         <ul className="mt-2 space-y-1">
           {sortedBody.slice(0, 5).map((r) => (
-            <li key={r.id} className="flex items-center gap-3 px-1 text-xs text-slate-500">
+            <li key={r.id} className="flex items-center gap-3 px-1 text-xs text-zinc-500">
               <span className="w-14 tabular-nums">{formatShort(r.date)}</span>
-              <span className="tabular-nums text-slate-400">
+              <span className="tabular-nums text-zinc-400">
                 {r.weightKg != null && `${r.weightKg}kg`}
                 {r.waistCm != null && ` · 허리 ${r.waistCm}cm`}
               </span>
@@ -159,22 +159,22 @@ export default function History() {
           {sorted.slice(0, 20).map((s) => {
             const done = s.entries.reduce((n, e) => n + e.sets.filter((x) => x.done).length, 0)
             return (
-              <li key={s.id} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+              <li key={s.id} className="rounded-lg bg-zinc-900/60 p-4">
                 <div className="flex items-center gap-2">
                   <Pill tone="sky">세션 {s.type}</Pill>
                   {s.short && <Pill tone="amber">40분 컷</Pill>}
-                  <span className="text-sm text-slate-300">{formatKo(s.date)}</span>
-                  <span className="ml-auto text-xs tabular-nums text-slate-500">{done}세트</span>
+                  <span className="text-sm text-zinc-300">{formatKo(s.date)}</span>
+                  <span className="ml-auto text-xs tabular-nums text-zinc-500">{done}세트</span>
                 </div>
-                <p className="mt-2 text-xs tabular-nums text-slate-500">
+                <p className="mt-2 text-xs tabular-nums text-zinc-500">
                   총 볼륨 {Math.round(sessionTonnage(s)).toLocaleString()}kg
                 </p>
                 <ul className="mt-2 space-y-0.5">
                   {s.entries
                     .filter((e) => e.sets.some((x) => x.done))
                     .map((e) => (
-                      <li key={e.exerciseId} className="text-xs text-slate-400">
-                        <span className="text-slate-500">{findExercise(e.exerciseId)?.name}</span>{' '}
+                      <li key={e.exerciseId} className="text-xs text-zinc-400">
+                        <span className="text-zinc-500">{findExercise(e.exerciseId)?.name}</span>{' '}
                         {e.sets
                           .filter((x) => x.done)
                           .map((x) => `${x.weight ?? '-'}×${x.reps ?? '-'}`)
@@ -182,7 +182,7 @@ export default function History() {
                       </li>
                     ))}
                 </ul>
-                {s.memo && <p className="mt-2 text-xs text-slate-500 italic">{s.memo}</p>}
+                {s.memo && <p className="mt-2 text-xs text-zinc-500 italic">{s.memo}</p>}
               </li>
             )
           })}
@@ -190,10 +190,10 @@ export default function History() {
       )}
 
       <SectionTitle>판단 기준</SectionTitle>
-      <ul className="space-y-1.5 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-xs text-slate-400">
+      <ul className="space-y-1.5 rounded-lg bg-zinc-900/40 p-4 text-xs text-zinc-400">
         {PROGRESS_NOTES.map((n) => (
           <li key={n} className="flex gap-1.5">
-            <span className="text-sky-600">·</span>
+            <span className="text-zinc-700">—</span>
             {n}
           </li>
         ))}

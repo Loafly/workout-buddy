@@ -22,20 +22,20 @@ function MacroBar({
   unit: string
   tone: string
 }) {
-  const pct = Math.min(100, Math.round((value / target) * 100))
+  const pct = target > 0 ? Math.min(100, Math.round((value / target) * 100)) : 0
   return (
     <div>
       <div className="flex items-baseline justify-between text-xs">
-        <span className="text-slate-400">{label}</span>
-        <span className="tabular-nums text-slate-300">
+        <span className="text-zinc-400">{label}</span>
+        <span className="tabular-nums text-zinc-300">
           {Math.round(value)}
-          <span className="text-slate-600">
+          <span className="text-zinc-600">
             /{target}
             {unit}
           </span>
         </span>
       </div>
-      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-800">
+      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-800">
         <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -107,28 +107,28 @@ export default function Diet() {
       {!isConfigured(profile) && (
         <Link
           to="/settings"
-          className="mb-3 block rounded-2xl border border-dashed border-amber-900/60 bg-amber-950/20 p-4 text-sm text-amber-200"
+          className="mb-4 block border-l-2 border-amber-600/70 pl-3 text-[13px] text-zinc-400"
         >
-          체중을 입력해야 목표 칼로리와 매크로가 계산됩니다 — 설정에서 프로필 채우기 →
+          체중을 입력해야 목표 칼로리와 매크로가 계산됩니다. 설정에서 프로필 채우기 →
         </Link>
       )}
 
       <Card>
         <div className="mb-3 flex items-baseline justify-between">
-          <span className="text-3xl font-bold tabular-nums text-slate-100">
+          <span className="text-3xl font-bold tabular-nums text-zinc-100">
             {Math.round(sum.kcal)}
           </span>
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-zinc-500">
             / {target.kcal} kcal · 남은 {Math.max(0, target.kcal - Math.round(sum.kcal))}
           </span>
         </div>
         <div className="space-y-2.5">
-          <MacroBar label="단백질" value={sum.protein} target={target.protein} unit="g" tone="bg-sky-500" />
-          <MacroBar label="탄수화물" value={sum.carbs} target={target.carbs} unit="g" tone="bg-emerald-500" />
-          <MacroBar label="지방" value={sum.fat} target={target.fat} unit="g" tone="bg-amber-500" />
+          <MacroBar label="단백질" value={sum.protein} target={target.protein} unit="g" tone="bg-zinc-100" />
+          <MacroBar label="탄수화물" value={sum.carbs} target={target.carbs} unit="g" tone="bg-zinc-400" />
+          <MacroBar label="지방" value={sum.fat} target={target.fat} unit="g" tone="bg-zinc-600" />
         </div>
         {sum.protein < target.protein && target.protein > 0 && (
-          <p className="mt-3 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-zinc-500">
             단백질 {Math.round(target.protein - sum.protein)}g 남음 — 끼니당 35~40g 기준
           </p>
         )}
@@ -147,19 +147,19 @@ export default function Diet() {
           {meals.map((m) => (
             <li
               key={m.id}
-              className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3"
+              className="flex items-center gap-3 rounded-lg bg-zinc-900/60 px-4 py-3"
             >
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-slate-200">
-                  <span className="text-slate-500">{m.slot}</span> {m.desc}
+                <p className="text-sm text-zinc-200">
+                  <span className="text-zinc-500">{m.slot}</span> {m.desc}
                 </p>
-                <p className="mt-0.5 text-xs tabular-nums text-slate-500">
+                <p className="mt-0.5 text-xs tabular-nums text-zinc-500">
                   {m.kcal}kcal · P{m.protein} C{m.carbs} F{m.fat}
                 </p>
               </div>
               <button
                 onClick={() => db.meals.delete(m.id!)}
-                className="shrink-0 text-xs text-slate-600 active:text-rose-400"
+                className="shrink-0 text-xs text-zinc-600 active:text-rose-400"
               >
                 삭제
               </button>
@@ -168,39 +168,39 @@ export default function Diet() {
         </ul>
       )}
 
-      <SectionTitle>빠른 기록 (계획서 예시 식단)</SectionTitle>
+      <SectionTitle>빠른 기록</SectionTitle>
       <div className="space-y-2">
         {MEAL_PRESETS.map((p) => (
-          <Card key={p.slot} onClick={() => addPreset(p)} className="active:bg-slate-800">
+          <Card key={p.slot} onClick={() => addPreset(p)} className="active:bg-zinc-800">
             <div className="flex items-center gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-slate-200">
-                  <span className="text-slate-500">{p.slot}</span> {p.desc}
+                <p className="text-sm text-zinc-200">
+                  <span className="text-zinc-500">{p.slot}</span> {p.desc}
                 </p>
-                <p className="mt-0.5 text-xs tabular-nums text-slate-500">
+                <p className="mt-0.5 text-xs tabular-nums text-zinc-500">
                   {p.kcal}kcal · P{p.protein} C{p.carbs} F{p.fat}
                 </p>
               </div>
-              <span className="shrink-0 text-lg text-sky-500">+</span>
+              <span className="shrink-0 text-lg text-zinc-400">+</span>
             </div>
           </Card>
         ))}
       </div>
 
       {adding ? (
-        <div className="mt-3 space-y-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+        <div className="mt-3 space-y-2 rounded-lg bg-zinc-900/60 p-4">
           <div className="flex gap-2">
             <input
               value={form.slot}
               onChange={(e) => setForm({ ...form, slot: e.target.value })}
               placeholder="끼니 (예: 점심)"
-              className="w-28 rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+              className="w-28 rounded-md bg-zinc-950 px-2.5 py-2 text-sm text-zinc-100 outline-none ring-1 ring-zinc-800 placeholder:text-zinc-700 focus:ring-zinc-500"
             />
             <input
               value={form.desc}
               onChange={(e) => setForm({ ...form, desc: e.target.value })}
               placeholder="내용"
-              className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+              className="flex-1 rounded-md bg-zinc-950 px-2.5 py-2 text-sm text-zinc-100 outline-none ring-1 ring-zinc-800 placeholder:text-zinc-700 focus:ring-zinc-500"
             />
           </div>
           <div className="grid grid-cols-4 gap-2">
@@ -227,7 +227,7 @@ export default function Diet() {
       <SectionTitle>오늘 컨디션</SectionTitle>
       <Card>
         <div className="flex items-center gap-3">
-          <span className="flex-1 text-sm text-slate-300">수면</span>
+          <span className="flex-1 text-sm text-zinc-300">수면</span>
           <NumberField
             value={daily?.sleepHours ?? null}
             onChange={(v) => patchDaily({ sleepHours: v ?? undefined })}
@@ -244,10 +244,10 @@ export default function Diet() {
             onChange={(e) => patchDaily({ alcohol: e.target.checked })}
             className="h-4 w-4 accent-rose-500"
           />
-          <span className="flex-1 text-sm text-slate-300">음주</span>
+          <span className="flex-1 text-sm text-zinc-300">음주</span>
         </label>
         {(daily?.sleepHours != null && daily.sleepHours < 6) || daily?.alcohol ? (
-          <p className="mt-3 rounded-lg bg-rose-950/30 p-2.5 text-xs text-rose-300">
+          <p className="mt-3 rounded-lg bg-zinc-900 p-2.5 text-xs text-rose-300">
             {daily?.alcohol && '술은 지방 산화를 직접 억제하고 내장지방과 상관관계가 가장 높습니다. '}
             {daily?.sleepHours != null &&
               daily.sleepHours < 6 &&
@@ -257,10 +257,10 @@ export default function Diet() {
       </Card>
 
       <SectionTitle>원칙</SectionTitle>
-      <ul className="space-y-1.5 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-xs text-slate-400">
+      <ul className="space-y-1.5 rounded-lg bg-zinc-900/40 p-4 text-xs text-zinc-400">
         {NUTRITION_RULES.map((r) => (
           <li key={r} className="flex gap-1.5">
-            <span className="text-sky-600">·</span>
+            <span className="text-zinc-700">—</span>
             {r}
           </li>
         ))}
@@ -269,9 +269,9 @@ export default function Diet() {
       <SectionTitle>단백질 참고</SectionTitle>
       <div className="grid grid-cols-2 gap-2">
         {PROTEIN_REFERENCE.map(([food, g]) => (
-          <div key={food} className="rounded-xl border border-slate-800 bg-slate-900/40 px-3 py-2.5">
-            <p className="text-xs text-slate-400">{food}</p>
-            <p className="text-sm font-semibold tabular-nums text-sky-300">{g}g</p>
+          <div key={food} className="rounded-lg bg-zinc-900/40 px-3 py-2.5">
+            <p className="text-xs text-zinc-400">{food}</p>
+            <p className="text-sm font-semibold tabular-nums text-zinc-200">{g}g</p>
           </div>
         ))}
       </div>
