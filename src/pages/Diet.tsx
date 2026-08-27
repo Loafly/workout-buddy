@@ -1,0 +1,262 @@
+import { useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import PageHeader from '../components/PageHeader'
+import { Button, Card, Empty, NumberField, Pill, SectionTitle } from '../components/ui'
+import { MEAL_PRESETS, NUTRITION_RULES, PROTEIN_REFERENCE, TARGETS } from '../data/nutrition'
+import { db, type Meal, type WorkoutSession } from '../db'
+import { formatKo, toDateKey } from '../lib/date'
+
+function MacroBar({
+  label,
+  value,
+  target,
+  unit,
+  tone,
+}: {
+  label: string
+  value: number
+  target: number
+  unit: string
+  tone: string
+}) {
+  const pct = Math.min(100, Math.round((value / target) * 100))
+  return (
+    <div>
+      <div className="flex items-baseline justify-between text-xs">
+        <span className="text-slate-400">{label}</span>
+        <span className="tabular-nums text-slate-300">
+          {Math.round(value)}
+          <span className="text-slate-600">
+            /{target}
+            {unit}
+          </span>
+        </span>
+      </div>
+      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-800">
+        <div className={`h-full rounded-full ${tone}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  )
+}
+
+const blank = { slot: '', desc: '', kcal: null, protein: null, carbs: null, fat: null }
+
+export default function Diet() {
+  const today = toDateKey()
+  const [form, setForm] = useState<{
+    slot: string
+    desc: string
+    kcal: number | null
+    protein: number | null
+    carbs: number | null
+    fat: number | null
+  }>(blank)
+  const [adding, setAdding] = useState(false)
+
+  const meals = useLiveQuery(() => db.meals.where('date').equals(today).toArray(), [today], [] as Meal[])
+  const sessions = useLiveQuery(() => db.sessions.toArray(), [], [] as WorkoutSession[])
+  const daily = useLiveQuery(() => db.daily.get(today), [today])
+
+  const isTrainingDay = sessions.some((s) => s.date === today)
+  const target = isTrainingDay ? TARGETS.training : TARGETS.rest
+
+  const sum = meals.reduce(
+    (a, m) => ({
+      kcal: a.kcal + m.kcal,
+      protein: a.protein + m.protein,
+      carbs: a.carbs + m.carbs,
+      fat: a.fat + m.fat,
+    }),
+    { kcal: 0, protein: 0, carbs: 0, fat: 0 },
+  )
+
+  const addPreset = (p: (typeof MEAL_PRESETS)[number]) =>
+    db.meals.add({ date: today, ...p, createdAt: Date.now() })
+
+  const addCustom = async () => {
+    if (!form.desc.trim()) return
+    await db.meals.add({
+      date: today,
+      slot: form.slot.trim() || '식사',
+      desc: form.desc.trim(),
+      kcal: form.kcal ?? 0,
+      protein: form.protein ?? 0,
+      carbs: form.carbs ?? 0,
+      fat: form.fat ?? 0,
+      createdAt: Date.now(),
+    })
+    setForm(blank)
+    setAdding(false)
+  }
+
+  const patchDaily = (patch: Partial<NonNullable<typeof daily>>) =>
+    db.daily.put({ ...(daily ?? { date: today }), date: today, ...patch })
+
+  return (
+    <>
+      <PageHeader
+        title="식단"
+        sub={formatKo(today)}
+        right={<Pill tone={isTrainingDay ? 'sky' : 'slate'}>{isTrainingDay ? '운동일' : '휴식일'}</Pill>}
+      />
+
+      <Card>
+        <div className="mb-3 flex items-baseline justify-between">
+          <span className="text-3xl font-bold tabular-nums text-slate-100">
+            {Math.round(sum.kcal)}
+          </span>
+          <span className="text-sm text-slate-500">
+            / {target.kcal} kcal · 남은 {Math.max(0, target.kcal - Math.round(sum.kcal))}
+          </span>
+        </div>
+        <div className="space-y-2.5">
+          <MacroBar label="단백질" value={sum.protein} target={target.protein} unit="g" tone="bg-sky-500" />
+          <MacroBar label="탄수화물" value={sum.carbs} target={target.carbs} unit="g" tone="bg-emerald-500" />
+          <MacroBar label="지방" value={sum.fat} target={target.fat} unit="g" tone="bg-amber-500" />
+        </div>
+        {sum.protein < target.protein && (
+          <p className="mt-3 text-xs text-slate-500">
+            단백질 {Math.round(target.protein - sum.protein)}g 남음 — 끼니당 35~40g 기준
+          </p>
+        )}
+      </Card>
+
+      <SectionTitle right={`${meals.length}개`}>오늘 먹은 것</SectionTitle>
+      {meals.length === 0 ? (
+        <Empty>아래 예시 식단을 눌러 바로 기록하거나 직접 입력하세요.</Empty>
+      ) : (
+        <ul className="space-y-2">
+          {meals.map((m) => (
+            <li
+              key={m.id}
+              className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-slate-200">
+                  <span className="text-slate-500">{m.slot}</span> {m.desc}
+                </p>
+                <p className="mt-0.5 text-xs tabular-nums text-slate-500">
+                  {m.kcal}kcal · P{m.protein} C{m.carbs} F{m.fat}
+                </p>
+              </div>
+              <button
+                onClick={() => db.meals.delete(m.id!)}
+                className="shrink-0 text-xs text-slate-600 active:text-rose-400"
+              >
+                삭제
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <SectionTitle>빠른 기록 (계획서 예시 식단)</SectionTitle>
+      <div className="space-y-2">
+        {MEAL_PRESETS.map((p) => (
+          <Card key={p.slot} onClick={() => addPreset(p)} className="active:bg-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-slate-200">
+                  <span className="text-slate-500">{p.slot}</span> {p.desc}
+                </p>
+                <p className="mt-0.5 text-xs tabular-nums text-slate-500">
+                  {p.kcal}kcal · P{p.protein} C{p.carbs} F{p.fat}
+                </p>
+              </div>
+              <span className="shrink-0 text-lg text-sky-500">+</span>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {adding ? (
+        <div className="mt-3 space-y-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+          <div className="flex gap-2">
+            <input
+              value={form.slot}
+              onChange={(e) => setForm({ ...form, slot: e.target.value })}
+              placeholder="끼니 (예: 점심)"
+              className="w-28 rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+            />
+            <input
+              value={form.desc}
+              onChange={(e) => setForm({ ...form, desc: e.target.value })}
+              placeholder="내용"
+              className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            <NumberField value={form.kcal} onChange={(v) => setForm({ ...form, kcal: v })} placeholder="kcal" />
+            <NumberField value={form.protein} onChange={(v) => setForm({ ...form, protein: v })} placeholder="P" suffix="g" />
+            <NumberField value={form.carbs} onChange={(v) => setForm({ ...form, carbs: v })} placeholder="C" suffix="g" />
+            <NumberField value={form.fat} onChange={(v) => setForm({ ...form, fat: v })} placeholder="F" suffix="g" />
+          </div>
+          <div className="flex gap-2">
+            <Button className="flex-1" onClick={addCustom}>
+              추가
+            </Button>
+            <Button variant="ghost" onClick={() => setAdding(false)}>
+              취소
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Button variant="ghost" className="mt-3 w-full" onClick={() => setAdding(true)}>
+          직접 입력
+        </Button>
+      )}
+
+      <SectionTitle>오늘 컨디션</SectionTitle>
+      <Card>
+        <div className="flex items-center gap-3">
+          <span className="flex-1 text-sm text-slate-300">수면</span>
+          <NumberField
+            value={daily?.sleepHours ?? null}
+            onChange={(v) => patchDaily({ sleepHours: v ?? undefined })}
+            placeholder="시간"
+            suffix="h"
+            step={0.5}
+            className="w-28"
+          />
+        </div>
+        <label className="mt-3 flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={daily?.alcohol ?? false}
+            onChange={(e) => patchDaily({ alcohol: e.target.checked })}
+            className="h-4 w-4 accent-rose-500"
+          />
+          <span className="flex-1 text-sm text-slate-300">음주</span>
+        </label>
+        {(daily?.sleepHours != null && daily.sleepHours < 6) || daily?.alcohol ? (
+          <p className="mt-3 rounded-lg bg-rose-950/30 p-2.5 text-xs text-rose-300">
+            {daily?.alcohol && '술은 지방 산화를 직접 억제하고 내장지방과 상관관계가 가장 높습니다. '}
+            {daily?.sleepHours != null &&
+              daily.sleepHours < 6 &&
+              '수면 6시간 미만은 코르티솔을 올려 복부 축적 + 회복 저해로 이어집니다.'}
+          </p>
+        ) : null}
+      </Card>
+
+      <SectionTitle>원칙</SectionTitle>
+      <ul className="space-y-1.5 rounded-2xl border border-slate-800 bg-slate-900/40 p-4 text-xs text-slate-400">
+        {NUTRITION_RULES.map((r) => (
+          <li key={r} className="flex gap-1.5">
+            <span className="text-sky-600">·</span>
+            {r}
+          </li>
+        ))}
+      </ul>
+
+      <SectionTitle>단백질 참고</SectionTitle>
+      <div className="grid grid-cols-2 gap-2">
+        {PROTEIN_REFERENCE.map(([food, g]) => (
+          <div key={food} className="rounded-xl border border-slate-800 bg-slate-900/40 px-3 py-2.5">
+            <p className="text-xs text-slate-400">{food}</p>
+            <p className="text-sm font-semibold tabular-nums text-sky-300">{g}g</p>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
